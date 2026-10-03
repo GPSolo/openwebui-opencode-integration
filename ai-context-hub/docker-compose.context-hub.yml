@@ -1,0 +1,29 @@
+# Add this service to the SAME compose project as your existing Open WebUI.
+# It intentionally joins the default Compose network so it can reach
+# `open-webui:8080` without changing open-terminal at all.
+
+services:
+  context-hub:
+    build:
+      context: ./ai-context-hub/context-hub
+      dockerfile: Dockerfile
+    image: ai-context-hub:local
+    container_name: ai-context-hub
+    restart: unless-stopped
+    volumes:
+      - context-hub:/data
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      - OPENWEBUI_URL=http://open-webui:8080
+      - OPENWEBUI_API_KEY=${OPENWEBUI_API_KEY}
+      - OPENCODE_URL=http://host.docker.internal:4096
+      - OPENCODE_USERNAME=${OPENCODE_USERNAME-opencode}
+      - OPENCODE_PASSWORD=${OPENCODE_PASSWORD}
+      - CONTEXT_HUB_TOKEN=${CONTEXT_HUB_TOKEN}
+      - OWUI_SYNC_INTERVAL=${OWUI_SYNC_INTERVAL-60}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+volumes:
+  context-hub: {}

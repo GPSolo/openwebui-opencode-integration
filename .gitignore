@@ -1,0 +1,2 @@
+*.env
+.webui_secret_key

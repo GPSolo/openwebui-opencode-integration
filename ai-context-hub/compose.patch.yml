@@ -1,0 +1,54 @@
+# This is the exact merge to your current compose file.
+# Keep BOTH of your existing services unchanged.
+
+services:
+  open-webui:
+    # ... your existing configuration stays exactly as-is ...
+
+  open-terminal:
+    # ... your existing configuration stays exactly as-is ...
+
+  context-hub:
+    build:
+      context: ./ai-context-hub/context-hub
+      dockerfile: Dockerfile
+    image: ai-context-hub:local
+    container_name: ai-context-hub
+    volumes:
+      - context-hub:/data
+    restart: unless-stopped
+    environment:
+      - 'OPENWEBUI_URL=http://open-webui:8080'
+      - 'OPENWEBUI_API_KEY=${OPENWEBUI_API_KEY}'
+      - 'OPENCODE_URL=http://host.docker.internal:4096'
+      - 'OPENCODE_USERNAME=${OPENCODE_USERNAME-opencode}'
+      - 'OPENCODE_PASSWORD=${OPENCODE_PASSWORD}'
+      - 'CONTEXT_HUB_TOKEN=${CONTEXT_HUB_TOKEN}'
+      - 'OWUI_SYNC_INTERVAL=${OWUI_SYNC_INTERVAL-60}'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  context-hub:
+    build:
+      context: ./ai-context-hub/context-hub
+      dockerfile: Dockerfile
+    image: ai-context-hub:local
+    container_name: ai-context-hub
+    volumes:
+      - context-hub:/data
+    restart: unless-stopped
+    environment:
+      - 'OPENWEBUI_URL=http://open-webui:8080'
+      - 'OPENWEBUI_API_KEY=${OPENWEBUI_API_KEY}'
+      - 'OPENCODE_URL=http://host.docker.internal:4096'
+      - 'OPENCODE_USERNAME=${OPENCODE_USERNAME-opencode}'
+      - 'OPENCODE_PASSWORD=${OPENCODE_PASSWORD}'
+      - 'CONTEXT_HUB_TOKEN=${CONTEXT_HUB_TOKEN}'
+      - 'OWUI_SYNC_INTERVAL=${OWUI_SYNC_INTERVAL-60}'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+volumes:
+  open-terminal: {}
+  open-webui: {}
+  context-hub: {}

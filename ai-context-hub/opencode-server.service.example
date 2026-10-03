@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenCode headless server for AI Context Hub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=OPENCODE_SERVER_USERNAME=opencode
+EnvironmentFile=%h/.config/opencode/context-hub.env
+ExecStart=/usr/bin/env opencode serve --hostname 0.0.0.0 --port 4096
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

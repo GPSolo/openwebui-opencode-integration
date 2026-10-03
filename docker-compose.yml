@@ -1,0 +1,57 @@
+services:
+  open-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - ${OPEN_WEBUI_PORT-3000}:8080
+    environment:
+      - 'OLLAMA_BASE_URL=http://host.docker.internal:11434'
+      - 'WEBUI_SECRET_KEY=b498dbe9f030fda407a37b85a1fb24d4f61413357d29b65b35e97478d44c6f99'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal
+    container_name: open-terminal
+    volumes:
+      - open-terminal:/home/<user>
+      - /home/<user>/Code:/home/<user>/CodeWorkspace/
+    
+
+    environment:
+      - OPEN_TERMINAL_API_KEY=${OPEN_TERMINAL_API_KEY}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  context-hub:
+    build:
+      context: ./ai-context-hub/context-hub
+      dockerfile: Dockerfile
+    image: ai-context-hub:local
+    container_name: ai-context-hub
+    volumes:
+      - context-hub:/data
+    ports:
+      - "127.0.0.1:8765:8765"
+    restart: unless-stopped
+    environment:
+      - 'OPENWEBUI_URL=http://open-webui:8080'
+      - 'OPENWEBUI_API_KEY=${OPENWEBUI_API_KEY}'
+      - 'OPENCODE_URL=http://host.docker.internal:4096'
+      - 'OPENCODE_USERNAME=${OPENCODE_USERNAME-opencode}'
+      - 'OPENCODE_PASSWORD=${OPENCODE_PASSWORD}'
+      - 'CONTEXT_HUB_TOKEN=${CONTEXT_HUB_TOKEN}'
+      - 'OWUI_SYNC_INTERVAL=${OWUI_SYNC_INTERVAL-60}'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+volumes:
+  open-terminal: {}
+  open-webui: {}
+  context-hub: {}
